@@ -1,0 +1,511 @@
+def barreraVirtualGuiatge():
+  global _hidden_verificationVariable=0
+  step_count_b7235f0a_cbb2_4c42_8fc8_6f2b845147a7 = 0.0
+  thread Step_Counter_Thread_6ee0f1eb_1164_4362_bee5_6726ac1a9d95():
+    while (True):
+      step_count_b7235f0a_cbb2_4c42_8fc8_6f2b845147a7 = step_count_b7235f0a_cbb2_4c42_8fc8_6f2b845147a7 + 1.0
+      sync()
+    end
+  end
+  run Step_Counter_Thread_6ee0f1eb_1164_4362_bee5_6726ac1a9d95()
+  set_standard_analog_input_domain(0, 1)
+  set_standard_analog_input_domain(1, 1)
+  set_tool_analog_input_domain(0, 1)
+  set_tool_analog_input_domain(1, 1)
+  set_analog_outputdomain(0, 0)
+  set_analog_outputdomain(1, 0)
+  set_input_actions_to_default()
+  set_safety_mode_transition_hardness(1)
+  set_gravity([0.0, 0.0, 9.82])
+  set_target_payload(0.000000, [0.000000, 0.000000, 0.000000], [0.000000, 0.000000, 0.000000, 0.000000, 0.000000, 0.000000])
+  set_tcp(p[0.0,0.0,0.145,0.0,0.0,0.0])
+  set_tool_communication(False, 115200, 0, 1, 1.5, 3.5)
+  set_tool_output_mode(0)
+  set_tool_digital_output_mode(0, 1)
+  set_tool_digital_output_mode(1, 1)
+  set_tool_voltage(0)
+  global Plane_1=p[-0.1368615374780743,-0.25928082173531203,0.2504135943406838,-5.2917103496771535E-11,-4.180449287005053E-11,1.570796326752836]
+  global Plane_2=p[-0.1742088076450252,-0.2,0.02622608731903274,1.570796326794897,5.089570548264191E-11,5.41594168576528E-11]
+  global Point_1=p[-0.13686153749022492,-0.3193814880431104,0.3187602624678359,0.5536180370159867,1.9121181481894585,-1.831476432614759]
+  global Point_2=p[-0.13686153751823135,-0.26718082172328733,0.031817929521107666,-0.0012213596567563713,3.11627652848082,0.03889191563370371]
+  def calculate_point_to_move_towards(feature, direction, position_distance):
+    local posDir=[direction[0], direction[1], direction[2]]
+    if (norm(posDir) < 1e-6):
+      return get_target_waypoint()
+    end
+    local direction_vector_normalized=normalize(posDir)
+    local displacement_pose=p[direction_vector_normalized[0] * position_distance,direction_vector_normalized[1] * position_distance,direction_vector_normalized[2] * position_distance,0,0,0]
+    local wanted_displacement_in_base_frame=pose_sub(pose_trans(feature, displacement_pose), feature)
+    return pose_add(get_target_waypoint(), wanted_displacement_in_base_frame)
+  end
+  $ 89 "Thread_1"
+  thread Thread_1():
+    while (True):
+      $ 90 "llistaTCPactual≔get_actual_tcp_pose()"
+      global llistaTCPactual= get_actual_tcp_pose ()
+      $ 91 "llistaFlangeAct≔get_actual_tool_flange_pose()"
+      global llistaFlangeAct=get_actual_tool_flange_pose()
+      $ 92 "llistaMigAct≔p[(llistaTCPactual[0]+llistaFlangeAct[0])/2,(llistaTCPactual[1]+llistaFlangeAct[1])/2,(llistaTCPactual[2]+llistaFlangeAct[2])/2,llistaTCPactual[3],llistaTCPactual[4],llistaTCPactual[5]]"
+      global llistaMigAct=p[(llistaTCPactual[0]+llistaFlangeAct[0])/2,(llistaTCPactual[1]+llistaFlangeAct[1])/2,(llistaTCPactual[2]+llistaFlangeAct[2])/2,llistaTCPactual[3],llistaTCPactual[4],llistaTCPactual[5]]
+      $ 93 "'Amb IFs pq el thread es un bucle pq te indicat loops forever'"
+      # 'Amb IFs pq el thread es un bucle pq te indicat loops forever'
+      $ 94 "'Mirem el TCP'"
+      # 'Mirem el TCP'
+      $ 95 "If (llistaTCPactual[2]-centre[2])≤alturaCon and (llistaTCPactual[2]-centre[2])>0"
+      if ((llistaTCPactual[2]-centre[2]) <= alturaCon  and  (llistaTCPactual[2]-centre[2])>0):
+        $ 96 "r≔R-(alturaCon-(llistaTCPactual[2]-centre[2]))-rTCP"
+        global r=R-(alturaCon-(llistaTCPactual[2]-centre[2]))-rTCP
+        $ 97 "'Calculem la distancia entre dos punts, el centre i el tcp al pla X-Y'"
+        # 'Calculem la distancia entre dos punts, el centre i el tcp al pla X-Y'
+        $ 98 "distPunts≔sqrt(pow(llistaTCPactual[0]-centre[0],2)+pow(llistaTCPactual[1]-centre[1],2))"
+        global distPunts=sqrt(pow(llistaTCPactual[0]-centre[0],2)+pow(llistaTCPactual[1]-centre[1],2))
+        $ 99 "'Si la distancia calculada supera el valor r, entrem a la condicio perque estem intentant superar el limit.'"
+        # 'Si la distancia calculada supera el valor r, entrem a la condicio perque estem intentant superar el limit.'
+        $ 100 "If distPunts≥r or distPunts≤-r"
+        global thread_flag_100=0
+        thread Thread_if_100():
+          $ 101 "surtTcpCon≔ True "
+          global surtTcpCon=  True  
+          thread_flag_100 = 1
+        end
+        if (distPunts >= r  or  distPunts <= -r):
+          global thread_handler_100=run Thread_if_100()
+          while (thread_flag_100 == 0):
+            if not(distPunts >= r  or  distPunts <= -r):
+              kill thread_handler_100
+              thread_flag_100 = 2
+            else:
+              sync()
+            end
+          end
+        else:
+          thread_flag_100 = 2
+        end
+      else:
+        $ 102 "ElseIf (llistaTCPactual[2]-centre[2])≤0 and (llistaTCPactual[2]-centre[2])≥-(alturaCilindre)"
+        if ((llistaTCPactual[2]-centre[2]) <= 0  and  (llistaTCPactual[2]-centre[2]) >= -(alturaCilindre)):
+          $ 103 "r≔R-alturaCon-rTCP"
+          global r=R-alturaCon-rTCP
+          $ 104 "'Calculem la distancia entre dos punts, el centre i el tcp al pla X-Y'"
+          # 'Calculem la distancia entre dos punts, el centre i el tcp al pla X-Y'
+          $ 105 "distPunts≔sqrt(pow(llistaTCPactual[0]-centre[0],2)+pow(llistaTCPactual[1]-centre[1],2))"
+          global distPunts=sqrt(pow(llistaTCPactual[0]-centre[0],2)+pow(llistaTCPactual[1]-centre[1],2))
+          $ 106 "'Si la distancia calculada supera el valor r, entrem a la condicio perque estem intentant superar el limit.'"
+          # 'Si la distancia calculada supera el valor r, entrem a la condicio perque estem intentant superar el limit.'
+          $ 107 "If distPunts≥r or distPunts≤-r"
+          global thread_flag_107=0
+          thread Thread_if_107():
+            $ 108 "surtTcpCilindre≔ True "
+            global surtTcpCilindre=  True  
+            thread_flag_107 = 1
+          end
+          if (distPunts >= r  or  distPunts <= -r):
+            global thread_handler_107=run Thread_if_107()
+            while (thread_flag_107 == 0):
+              if not(distPunts >= r  or  distPunts <= -r):
+                kill thread_handler_107
+                thread_flag_107 = 2
+              else:
+                sync()
+              end
+            end
+          else:
+            thread_flag_107 = 2
+          end
+        end
+      end
+      $ 109 "'Mirem el Flange'"
+      # 'Mirem el Flange'
+      $ 110 "If (llistaFlangeAct[2]-centre[2])≤alturaCon and (llistaFlangeAct[2]-centre[2])>0"
+      if ((llistaFlangeAct[2]-centre[2]) <= alturaCon  and  (llistaFlangeAct[2]-centre[2])>0):
+        $ 111 "rf≔R-(alturaCon-(llistaFlangeAct[2]-centre[2]))-rFlange"
+        global rf=R-(alturaCon-(llistaFlangeAct[2]-centre[2]))-rFlange
+        $ 112 "'Calculem la distancia entre dos punts, el centre i el flange al pla X-Y'"
+        # 'Calculem la distancia entre dos punts, el centre i el flange al pla X-Y'
+        $ 113 "distPuntFlange≔sqrt(pow(llistaFlangeAct[0]-centre[0],2)+pow(llistaFlangeAct[1]-centre[1],2))"
+        global distPuntFlange=sqrt(pow(llistaFlangeAct[0]-centre[0],2)+pow(llistaFlangeAct[1]-centre[1],2))
+        $ 114 "'Si la distancia calculada supera el valor rf, entrem a la condicio perque estem intentant superar el limit.'"
+        # 'Si la distancia calculada supera el valor rf, entrem a la condicio perque estem intentant superar el limit.'
+        $ 115 "If distPuntFlange≥rf or distPuntFlange≤-rf"
+        global thread_flag_115=0
+        thread Thread_if_115():
+          $ 116 "surtFlangeCon≔ True "
+          global surtFlangeCon=  True  
+          thread_flag_115 = 1
+        end
+        if (distPuntFlange >= rf  or  distPuntFlange <= -rf):
+          global thread_handler_115=run Thread_if_115()
+          while (thread_flag_115 == 0):
+            if not(distPuntFlange >= rf  or  distPuntFlange <= -rf):
+              kill thread_handler_115
+              thread_flag_115 = 2
+            else:
+              sync()
+            end
+          end
+        else:
+          thread_flag_115 = 2
+        end
+      else:
+        $ 117 "ElseIf (llistaFlangeAct[2]-centre[2])≤0 and (llistaFlangeAct[2]-centre[2])≥-(alturaCilindre)"
+        if ((llistaFlangeAct[2]-centre[2]) <= 0  and  (llistaFlangeAct[2]-centre[2]) >= -(alturaCilindre)):
+          $ 118 "rf≔R-alturaCon-rFlange"
+          global rf=R-alturaCon-rFlange
+          $ 119 "'Calculem la distancia entre dos punts, el centre i el Flange al pla X-Y'"
+          # 'Calculem la distancia entre dos punts, el centre i el Flange al pla X-Y'
+          $ 120 "distPuntFlange≔sqrt(pow(llistaFlangeAct[0]-centre[0],2)+pow(llistaFlangeAct[1]-centre[1],2))"
+          global distPuntFlange=sqrt(pow(llistaFlangeAct[0]-centre[0],2)+pow(llistaFlangeAct[1]-centre[1],2))
+          $ 121 "'Si la distancia calculada supera el valor r, entrem a la condicio perque estem intentant superar el limit.'"
+          # 'Si la distancia calculada supera el valor r, entrem a la condicio perque estem intentant superar el limit.'
+          $ 122 "If distPuntFlange≥rf or distPuntFlange≤-rf"
+          global thread_flag_122=0
+          thread Thread_if_122():
+            $ 123 "surtFlangeCilin≔ True "
+            global surtFlangeCilin=  True  
+            thread_flag_122 = 1
+          end
+          if (distPuntFlange >= rf  or  distPuntFlange <= -rf):
+            global thread_handler_122=run Thread_if_122()
+            while (thread_flag_122 == 0):
+              if not(distPuntFlange >= rf  or  distPuntFlange <= -rf):
+                kill thread_handler_122
+                thread_flag_122 = 2
+              else:
+                sync()
+              end
+            end
+          else:
+            thread_flag_122 = 2
+          end
+        end
+      end
+      $ 124 "'Mirem el punt del mig'"
+      # 'Mirem el punt del mig'
+      $ 125 "If (llistaMigAct[2]-centre[2])≤alturaCon and (llistaMigAct[2]-centre[2])>0"
+      if ((llistaMigAct[2]-centre[2]) <= alturaCon  and  (llistaMigAct[2]-centre[2])>0):
+        $ 126 "rm≔R-(alturaCon-(llistaMigAct[2]-centre[2]))-rMig"
+        global rm=R-(alturaCon-(llistaMigAct[2]-centre[2]))-rMig
+        $ 127 "'Calculem la distancia entre dos punts, el centre i el mig al pla X-Y'"
+        # 'Calculem la distancia entre dos punts, el centre i el mig al pla X-Y'
+        $ 128 "distPuntMig≔sqrt(pow(llistaMigAct[0]-centre[0],2)+pow(llistaMigAct[1]-centre[1],2))"
+        global distPuntMig=sqrt(pow(llistaMigAct[0]-centre[0],2)+pow(llistaMigAct[1]-centre[1],2))
+        $ 129 "'Si la distancia calculada supera el valor rf, entrem a la condicio perque estem intentant superar el limit.'"
+        # 'Si la distancia calculada supera el valor rf, entrem a la condicio perque estem intentant superar el limit.'
+        $ 130 "If distPuntMig≥rm or distPuntMig≤-rm"
+        global thread_flag_130=0
+        thread Thread_if_130():
+          $ 131 "surtMigCon≔ True "
+          global surtMigCon=  True  
+          thread_flag_130 = 1
+        end
+        if (distPuntMig >= rm  or  distPuntMig <= -rm):
+          global thread_handler_130=run Thread_if_130()
+          while (thread_flag_130 == 0):
+            if not(distPuntMig >= rm  or  distPuntMig <= -rm):
+              kill thread_handler_130
+              thread_flag_130 = 2
+            else:
+              sync()
+            end
+          end
+        else:
+          thread_flag_130 = 2
+        end
+      else:
+        $ 132 "ElseIf (llistaMigAct[2]-centre[2])≤0 and (llistaMigAct[2]-centre[2])≥-(alturaCilindre)"
+        if ((llistaMigAct[2]-centre[2]) <= 0  and  (llistaMigAct[2]-centre[2]) >= -(alturaCilindre)):
+          $ 133 "rm≔R-alturaCon-rMig"
+          global rm=R-alturaCon-rMig
+          $ 134 "'Calculem la distancia entre dos punts, el centre i el mig al pla X-Y'"
+          # 'Calculem la distancia entre dos punts, el centre i el mig al pla X-Y'
+          $ 135 "distPuntMig≔sqrt(pow(llistaMigAct[0]-centre[0],2)+pow(llistaMigAct[1]-centre[1],2))"
+          global distPuntMig=sqrt(pow(llistaMigAct[0]-centre[0],2)+pow(llistaMigAct[1]-centre[1],2))
+          $ 136 "'Si la distancia calculada supera el valor r, entrem a la condicio perque estem intentant superar el limit.'"
+          # 'Si la distancia calculada supera el valor r, entrem a la condicio perque estem intentant superar el limit.'
+          $ 137 "If distPuntMig≥rm or distPuntMig≤-rm"
+          global thread_flag_137=0
+          thread Thread_if_137():
+            $ 138 "surtMigCilin≔ True "
+            global surtMigCilin=  True  
+            thread_flag_137 = 1
+          end
+          if (distPuntMig >= rm  or  distPuntMig <= -rm):
+            global thread_handler_137=run Thread_if_137()
+            while (thread_flag_137 == 0):
+              if not(distPuntMig >= rm  or  distPuntMig <= -rm):
+                kill thread_handler_137
+                thread_flag_137 = 2
+              else:
+                sync()
+              end
+            end
+          else:
+            thread_flag_137 = 2
+          end
+        end
+      end
+    end
+  end
+  threadId_Thread_1 = run Thread_1()
+  $ 2 "Robot Program"
+  $ 3 "'Inicialitzem els variables que ens permeten saber si sortim de les barreres virtuals (con o cilindre).'"
+  # 'Inicialitzem els variables que ens permeten saber si sortim de les barreres virtuals (con o cilindre).'
+  $ 4 "surtTcpCon≔ False "
+  global surtTcpCon=  False  
+  $ 5 "surtTcpCilindre≔ False "
+  global surtTcpCilindre=  False  
+  $ 6 "surtFlangeCon≔ False "
+  global surtFlangeCon=  False  
+  $ 7 "surtFlangeCilin≔ False "
+  global surtFlangeCilin=  False  
+  $ 8 "surtMigCon≔ False "
+  global surtMigCon=  False  
+  $ 9 "surtMigCilin≔ False "
+  global surtMigCilin=  False  
+  $ 10 "'Indiquem les coordenades d'un punt central pel con i el cilindre.'"
+  # 'Indiquem les coordenades d'un punt central pel con i el cilindre.'
+  $ 11 "centre≔p[-0.018,-0.376,0.226,0,0,0]"
+  global centre=p[-0.018,-0.376,0.226,0,0,0]
+  $ 12 "'Inicialitzem la variable del radi de l'esfera del TCP, el Flange i el punt entremig.'"
+  # 'Inicialitzem la variable del radi de l'esfera del TCP, el Flange i el punt entremig.'
+  $ 13 "rTCP≔0.05"
+  global rTCP=0.05
+  $ 14 "rFlange≔0.06"
+  global rFlange=0.06
+  $ 15 "rMig≔0.05"
+  global rMig=0.05
+  $ 16 "'Indiquem la variable de radi i l'altura que volem al con.'"
+  # 'Indiquem la variable de radi i l'altura que volem al con.'
+  $ 17 "'R>alturaCon'"
+  # 'R>alturaCon'
+  $ 18 "R≔0.25"
+  global R=0.25
+  $ 19 "alturaCon≔0.15"
+  global alturaCon=0.15
+  $ 20 "'Definim l'altura del cilindre. El seu radi depend de l'alturaCon i R.'"
+  # 'Definim l'altura del cilindre. El seu radi depend de l'alturaCon i R.'
+  $ 21 "alturaCilindre≔0.15"
+  global alturaCilindre=0.15
+  $ 22 "'Definim la variable amb el valor que volem que retrocedeixi en el cilindre.'"
+  # 'Definim la variable amb el valor que volem que retrocedeixi en el cilindre.'
+  $ 23 "retrocedir≔0.005"
+  global retrocedir=0.005
+  $ 24 "'Activem el moviment lliure.'"
+  # 'Activem el moviment lliure.'
+  $ 25 "freedrive_mode()"
+  freedrive_mode()
+  $ 26 "Loop"
+  while (True):
+    $ 27 "If surtTcpCon≟ True  or surtTcpCilindre≟ True "
+    if (surtTcpCon ==   True    or  surtTcpCilindre ==   True  ):
+      $ 28 "'La condicio es compleix, estem intentant superar la barrera virtual. Parem el moviment lliure.'"
+      # 'La condicio es compleix, estem intentant superar la barrera virtual. Parem el moviment lliure.'
+      $ 29 "end_freedrive_mode()"
+      end_freedrive_mode()
+      $ 30 "'Obtenim la posició del TCP per mantenir els graus dels joints.'"
+      # 'Obtenim la posició del TCP per mantenir els graus dels joints.'
+      $ 31 "tcpActual≔get_actual_tcp_pose()"
+      global tcpActual= get_actual_tcp_pose ()
+      $ 32 "'Generem una variable centre amb els mateixos valors de x, y i z, pero amb els graus dels joints iguals que els de l'eina.'"
+      # 'Generem una variable centre amb els mateixos valors de x, y i z, pero amb els graus dels joints iguals que els de l'eina.'
+      $ 33 "centre2≔p[centre[0],centre[1],tcpActual[2],tcpActual[3],tcpActual[4],tcpActual[5]]"
+      global centre2=p[centre[0],centre[1],tcpActual[2],tcpActual[3],tcpActual[4],tcpActual[5]]
+      $ 34 "'Calculem el radi que hem de tenir en compte.'"
+      # 'Calculem el radi que hem de tenir en compte.'
+      $ 35 "If surtTcpCon≟ True "
+      global thread_flag_35=0
+      thread Thread_if_35():
+        $ 36 "'Calculem el radi pel con.'"
+        # 'Calculem el radi pel con.'
+        $ 37 "r≔R-(alturaCon-(tcpActual[2]-centre[2]))-rTCP"
+        global r=R-(alturaCon-(tcpActual[2]-centre[2]))-rTCP
+        thread_flag_35 = 1
+      end
+      if (surtTcpCon ==   True  ):
+        global thread_handler_35=run Thread_if_35()
+        while (thread_flag_35 == 0):
+          if not(surtTcpCon ==   True  ):
+            kill thread_handler_35
+            thread_flag_35 = 2
+          else:
+            sync()
+          end
+        end
+      else:
+        thread_flag_35 = 2
+      end
+      $ 38 "If surtTcpCilindre≟ True "
+      global thread_flag_38=0
+      thread Thread_if_38():
+        $ 39 "'Calculem el radi pel cilindre.'"
+        # 'Calculem el radi pel cilindre.'
+        $ 40 "r≔R-alturaCon-retrocedir-rTCP"
+        global r=R-alturaCon-retrocedir-rTCP
+        thread_flag_38 = 1
+      end
+      if (surtTcpCilindre ==   True  ):
+        global thread_handler_38=run Thread_if_38()
+        while (thread_flag_38 == 0):
+          if not(surtTcpCilindre ==   True  ):
+            kill thread_handler_38
+            thread_flag_38 = 2
+          else:
+            sync()
+          end
+        end
+      else:
+        thread_flag_38 = 2
+      end
+      $ 41 "'Ens movem en direcció el centre fins que la distancia entre el centre i el tcp sigui més petit o igual a la del radi r.'"
+      # 'Ens movem en direcció el centre fins que la distancia entre el centre i el tcp sigui més petit o igual a la del radi r.'
+      $ 42 "MoveL"
+      $ 43 "centre2" "breakAfter"
+      global move_thread_flag_43=0
+      thread move_thread_43():
+        enter_critical
+        move_thread_flag_43 = 1
+        movel(centre2, a=0.05, v=0.02)
+        move_thread_flag_43 = 2
+        exit_critical
+      end
+      move_thread_flag_43 = 0
+      move_thread_han_43 = run move_thread_43()
+      while (True):
+        if (point_dist( get_actual_tcp_pose (),centre2) <= r):
+          kill move_thread_han_43
+          stopl(0.05)
+          $ 44 "Until (expression)"
+          break
+        end
+        sleep(1.0E-10)
+        if (move_thread_flag_43 > 1):
+          join move_thread_han_43
+          break
+        end
+        sync()
+      end
+      $ 45 "'Tornem a activar el moviment.'"
+      # 'Tornem a activar el moviment.'
+      $ 46 "freedrive_mode()"
+      freedrive_mode()
+      $ 47 "'Ara ja tornem a estar a dins l'area de moviment permesa, surtTcpCon i surtTcpCilindre a False.'"
+      # 'Ara ja tornem a estar a dins l'area de moviment permesa, surtTcpCon i surtTcpCilindre a False.'
+      $ 48 "surtTcpCon≔ False "
+      global surtTcpCon=  False  
+      $ 49 "surtTcpCilindre≔ False "
+      global surtTcpCilindre=  False  
+    end
+    $ 50 "'Ara pel Flange'"
+    # 'Ara pel Flange'
+    $ 51 "If surtFlangeCon≟ True  or surtFlangeCilin≟ True "
+    if (surtFlangeCon ==   True    or  surtFlangeCilin ==   True  ):
+      $ 52 "'La condicio es compleix, estem intentant superar la barrera virtual. Parem el moviment lliure.'"
+      # 'La condicio es compleix, estem intentant superar la barrera virtual. Parem el moviment lliure.'
+      $ 53 "end_freedrive_mode()"
+      end_freedrive_mode()
+      $ 54 "'Obtenim la posició del Flange per mantenir els graus dels joints.'"
+      # 'Obtenim la posició del Flange per mantenir els graus dels joints.'
+      $ 55 "flangeAct≔get_actual_tool_flange_pose()"
+      global flangeAct=get_actual_tool_flange_pose()
+      $ 56 "'Generem una variable centre amb els mateixos valors de x, y i z, pero amb els graus dels joints iguals que els de la brida.'"
+      # 'Generem una variable centre amb els mateixos valors de x, y i z, pero amb els graus dels joints iguals que els de la brida.'
+      $ 57 "centre3≔p[centre[0],centre[1],flangeAct[2],flangeAct[3],flangeAct[4],flangeAct[5]]"
+      global centre3=p[centre[0],centre[1],flangeAct[2],flangeAct[3],flangeAct[4],flangeAct[5]]
+      $ 58 "'Ens movem en direcció el centre fins que hagi recorregut una certa distancia'"
+      # 'Ens movem en direcció el centre fins que hagi recorregut una certa distancia'
+      $ 59 "vectorDir≔[centre3[0]-flangeAct[0],centre3[1]-flangeAct[1],centre3[2]-flangeAct[2]]"
+      global vectorDir=[centre3[0]-flangeAct[0],centre3[1]-flangeAct[1],centre3[2]-flangeAct[2]]
+      $ 60 "MoveL"
+      $ 61 "Direction: Base"
+      global move_thread_flag_61=0
+      thread move_thread_61():
+        enter_critical
+        move_thread_flag_61 = 1
+        local towardsPos=calculate_point_to_move_towards(p[0.0,0.0,0.0,0.0,0.0,0.0], vectorDir, 0.005)
+        movel(towardsPos, a=0.05, v=0.02)
+        move_thread_flag_61 = 2
+        exit_critical
+      end
+      move_thread_flag_61 = 0
+      move_thread_han_61 = run move_thread_61()
+      while (True):
+        sleep(1.0E-10)
+        if (move_thread_flag_61 > 1):
+          join move_thread_han_61
+          $ 62 "Until (distance)"
+          break
+        end
+        sync()
+      end
+      $ 63 "'Tornem a activar el moviment.'"
+      # 'Tornem a activar el moviment.'
+      $ 64 "freedrive_mode()"
+      freedrive_mode()
+      $ 65 "'Ara ja tornem a estar a dins l'area de moviment permesa, surtFlangeCon i surtFlangeCilin a False.'"
+      # 'Ara ja tornem a estar a dins l'area de moviment permesa, surtFlangeCon i surtFlangeCilin a False.'
+      $ 66 "surtFlangeCon≔ False "
+      global surtFlangeCon=  False  
+      $ 67 "surtFlangeCilin≔ False "
+      global surtFlangeCilin=  False  
+    end
+    $ 68 "'Ara pel del mig'"
+    # 'Ara pel del mig'
+    $ 69 "If surtMigCon≟ True  or surtMigCilin≟ True "
+    if (surtMigCon ==   True    or  surtMigCilin ==   True  ):
+      $ 70 "'La condicio es compleix, estem intentant superar la barrera virtual. Parem el moviment lliure.'"
+      # 'La condicio es compleix, estem intentant superar la barrera virtual. Parem el moviment lliure.'
+      $ 71 "end_freedrive_mode()"
+      end_freedrive_mode()
+      $ 72 "'Obtenim la posició del mig per mantenir els graus dels joints.'"
+      # 'Obtenim la posició del mig per mantenir els graus dels joints.'
+      $ 73 "tcpActual≔get_actual_tcp_pose()"
+      global tcpActual= get_actual_tcp_pose ()
+      $ 74 "flangeAct≔get_actual_tool_flange_pose()"
+      global flangeAct=get_actual_tool_flange_pose()
+      $ 75 "migAct≔p[(tcpActual[0]+flangeAct[0])/2,(tcpActual[1]+flangeAct[1])/2,(tcpActual[2]+flangeAct[2])/2,tcpActual[3],tcpActual[4],tcpActual[5]]"
+      global migAct=p[(tcpActual[0]+flangeAct[0])/2,(tcpActual[1]+flangeAct[1])/2,(tcpActual[2]+flangeAct[2])/2,tcpActual[3],tcpActual[4],tcpActual[5]]
+      $ 76 "'Generem una variable centre amb els mateixos valors de x, y i z, pero amb els graus dels joints iguals que els de la brida.'"
+      # 'Generem una variable centre amb els mateixos valors de x, y i z, pero amb els graus dels joints iguals que els de la brida.'
+      $ 77 "centre4≔p[centre[0],centre[1],migAct[2],migAct[3],migAct[4],migAct[5]]"
+      global centre4=p[centre[0],centre[1],migAct[2],migAct[3],migAct[4],migAct[5]]
+      $ 78 "'Ens movem en direcció el centre fins que hagi recorregut una certa distancia'"
+      # 'Ens movem en direcció el centre fins que hagi recorregut una certa distancia'
+      $ 79 "vectorDir2≔[centre4[0]-migAct[0],centre4[1]-migAct[1],centre4[2]-migAct[2]]"
+      global vectorDir2=[centre4[0]-migAct[0],centre4[1]-migAct[1],centre4[2]-migAct[2]]
+      $ 80 "MoveL"
+      $ 81 "Direction: Base"
+      global move_thread_flag_81=0
+      thread move_thread_81():
+        enter_critical
+        move_thread_flag_81 = 1
+        local towardsPos=calculate_point_to_move_towards(p[0.0,0.0,0.0,0.0,0.0,0.0], vectorDir2, 0.005)
+        movel(towardsPos, a=0.05, v=0.02)
+        move_thread_flag_81 = 2
+        exit_critical
+      end
+      move_thread_flag_81 = 0
+      move_thread_han_81 = run move_thread_81()
+      while (True):
+        sleep(1.0E-10)
+        if (move_thread_flag_81 > 1):
+          join move_thread_han_81
+          $ 82 "Until (distance)"
+          break
+        end
+        sync()
+      end
+      $ 83 "'Tornem a activar el moviment.'"
+      # 'Tornem a activar el moviment.'
+      $ 84 "freedrive_mode()"
+      freedrive_mode()
+      $ 85 "'Ara ja tornem a estar a dins l'area de moviment permesa, surtFlangeCon i surtFlangeCilin a False.'"
+      # 'Ara ja tornem a estar a dins l'area de moviment permesa, surtFlangeCon i surtFlangeCilin a False.'
+      $ 86 "surtMigCon≔ False "
+      global surtMigCon=  False  
+      $ 87 "surtMigCilin≔ False "
+      global surtMigCilin=  False  
+    end
+    $ 88 "Wait: 0.01"
+    sleep(0.01)
+  end
+end

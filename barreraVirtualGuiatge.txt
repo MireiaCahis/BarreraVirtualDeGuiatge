@@ -1,5 +1,5 @@
  Program
-   Init Variables
+   Variables Setup
    Robot Program
      'Inicialitzem els variables que ens permeten saber si sortim de les barreres virtuals (con o cilindre).'
      surtTcpCon≔ False 
@@ -39,7 +39,7 @@
          If surtTcpCilindre≟ True 
            'Calculem el radi pel cilindre.'
            r≔R-alturaCon-retrocedir-rTCP
-         'Ens movem en direcció el centre fins que la distancia entre el centre i el tcp sigui més petit o igual a la del radi - 1mm'
+         'Ens movem en direcció el centre fins que la distancia entre el centre i el tcp sigui més petit o igual a la del radi r.'
          MoveL
            centre2
              Until (expression)
