@@ -19,8 +19,9 @@ En aquest repositori també es pot trobar el codi en format .txt que permet lleg
 **MANUAL D'USUARI:**
 En aquest manual d'usuari s'indica una petita guia per activar el funcionament del codi.
 
-    1. Modificar els valors de les variables de l'inici del robot per personalitzar la barrera virtual (Opcional).
-    2. Aproximar l'eina del robot a l'inici de la barrera virtual tot prement el botó de moviment lliure de la consola del robot.
-    3. Activar l'execució del codi de la consola del robot.
-    4. Moure manualment el braç robòtic dins el volum limitat passant pel con truncat invertit i tot seguit el cilindre fins arribar al punt d'interès. 
+    1. Assegurar la correcta configuració del TCP i el Payload de l'eina utilitzada.
+    2. Modificar els valors de les variables de l'inici del robot per personalitzar la barrera virtual (Opcional).
+    3. Aproximar l'eina del robot a l'inici de la barrera virtual tot prement el botó de moviment lliure de la consola del robot.
+    4. Activar l'execució del codi de la consola del robot.
+    5. Moure manualment el braç robòtic dins el volum limitat passant pel con truncat invertit i tot seguit el cilindre fins arribar al punt d'interès. 
     5. Observar com la barrera virtual limita la sortida dels límits i permet visualitzar cap a quina zona dirirgir-se.
