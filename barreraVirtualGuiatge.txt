@@ -54,8 +54,6 @@
          end_freedrive_mode()
          'Obtenim la posició del Flange per mantenir els graus dels joints.'
          flangeAct≔get_actual_tool_flange_pose()
-         'Generem una variable centre amb els mateixos valors de x, y i z, pero amb els graus dels joints iguals que els de la brida.'
-         centre3≔p[centre[0],centre[1],flangeAct[2],flangeAct[3],flangeAct[4],flangeAct[5]]
          'Ens movem en direcció el centre fins que hagi recorregut una certa distancia'
          vectorDir≔[centre3[0]-flangeAct[0],centre3[1]-flangeAct[1],centre3[2]-flangeAct[2]]
          MoveL
@@ -74,8 +72,6 @@
          tcpActual≔get_actual_tcp_pose()
          flangeAct≔get_actual_tool_flange_pose()
          migAct≔p[(tcpActual[0]+flangeAct[0])/2,(tcpActual[1]+flangeAct[1])/2,(tcpActual[2]+flangeAct[2])/2,tcpActual[3],tcpActual[4],tcpActual[5]]
-         'Generem una variable centre amb els mateixos valors de x, y i z, pero amb els graus dels joints iguals que els de la brida.'
-         centre4≔p[centre[0],centre[1],migAct[2],migAct[3],migAct[4],migAct[5]]
          'Ens movem en direcció el centre fins que hagi recorregut una certa distancia'
          vectorDir2≔[centre4[0]-migAct[0],centre4[1]-migAct[1],centre4[2]-migAct[2]]
          MoveL
