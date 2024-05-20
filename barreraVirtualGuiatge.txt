@@ -1,5 +1,5 @@
  Program
-   Init Variables
+   Variables Setup
    Robot Program
      'Inicialitzem els variables que ens permeten saber si sortim de les barreres virtuals (con o cilindre).'
      surtTcpCon≔ False 
@@ -10,7 +10,7 @@
      surtMigCilin≔ False 
      'Indiquem les coordenades d'un punt central pel con i el cilindre.'
      centre≔p[-0.018,-0.376,0.226,0,0,0]
-     'Inicialitzem la variable del radi de l'esfera del TCP, el Flange i el punt entremig.'
+     'Inicialitzem la variable del radi de l'esfera del TCP, el cap de l'eina i el punt entremig.'
      rTCP≔0.05
      rFlange≔0.06
      rMig≔0.05
@@ -20,8 +20,6 @@
      alturaCon≔0.15
      'Definim l'altura del cilindre. El seu radi depend de l'alturaCon i R.'
      alturaCilindre≔0.15
-     'Definim la variable amb el valor que volem que retrocedeixi en el cilindre.'
-     retrocedir≔0.005
      'Activem el moviment lliure.'
      freedrive_mode()
      Loop
@@ -29,30 +27,38 @@
          'La condicio es compleix, estem intentant superar la barrera virtual. Parem el moviment lliure.'
          end_freedrive_mode()
          'Obtenim la posició del TCP per mantenir els graus dels joints.'
+         Set
+         Set Payload: Payload_TCPEina 0.0s
          posAct≔get_actual_tcp_pose()
          'Cridem el subprograma que rectifica la posicio de l'eina.'
          Call rectificarPosicio
          'Ara ja tornem a estar a dins l'area de moviment permesa, surtTcpCon i surtTcpCilindre a False.'
          surtTcpCon≔ False 
          surtTcpCilindre≔ False 
-       'Ara pel Flange'
+       'Ara per la part superior de l'eina.'
        If surtFlangeCon≟ True  or surtFlangeCilin≟ True 
          'La condicio es compleix, estem intentant superar la barrera virtual. Parem el moviment lliure.'
          end_freedrive_mode()
-         'Obtenim la posició del Flange per mantenir els graus dels joints.'
-         posAct≔get_actual_tool_flange_pose()
+         'Obtenim la posició del cap de l'eina per mantenir els graus dels joints.'
+         Set
+         Set Payload: Payload_CapEina 0.0s
+         posAct≔get_actual_tcp_pose()
          'Cridem el subprograma que rectifica la posicio de l'eina.'
          Call rectificarPosicio
          'Ara ja tornem a estar a dins l'area de moviment permesa, surtFlangeCon i surtFlangeCilin a False.'
          surtFlangeCon≔ False 
          surtFlangeCilin≔ False 
-       'Ara pel del mig'
+       'Ara pel punt del mig.'
        If surtMigCon≟ True  or surtMigCilin≟ True 
          'La condicio es compleix, estem intentant superar la barrera virtual. Parem el moviment lliure.'
          end_freedrive_mode()
          'Obtenim la posició del mig per mantenir els graus dels joints.'
+         Set
+         Set Payload: Payload_TCPEina 0.0s
          tcpActual≔get_actual_tcp_pose()
-         flangeAct≔get_actual_tool_flange_pose()
+         Set
+         Set Payload: Payload_CapEina 0.0s
+         flangeAct≔get_actual_tcp_pose()
          posAct≔p[(tcpActual[0]+flangeAct[0])/2,(tcpActual[1]+flangeAct[1])/2,(tcpActual[2]+flangeAct[2])/2,tcpActual[3],tcpActual[4],tcpActual[5]]
          'Cridem el subprograma que rectifica la posicio de l'eina.'
          Call rectificarPosicio
@@ -66,6 +72,8 @@
      centre2≔p[centre[0],centre[1],posAct[2],posAct[3],posAct[4],posAct[5]]
      'Calculem el vector director per anar del punt actual de l'eina fins al centre.'
      vectorDir2≔[centre2[0]-posAct[0],centre2[1]-posAct[1],centre2[2]-posAct[2]]
+     'Donem marge de temps per pensar al software.'
+     Wait: 0.01
      'Ens movem en direcció el centre fins que hagi recorregut una certa distancia'
      MoveL
        Direction: Base
@@ -73,8 +81,12 @@
      'Tornem a activar el moviment.'
      freedrive_mode()
    Thread_1
+     Set
+     Set Payload: Payload_TCPEina 0.0s
      llistaTCPactual≔get_actual_tcp_pose()
-     llistaFlangeAct≔get_actual_tool_flange_pose()
+     Set
+     Set Payload: Payload_CapEina 0.0s
+     llistaFlangeAct≔get_actual_tcp_pose()
      llistaMigAct≔p[(llistaTCPactual[0]+llistaFlangeAct[0])/2,(llistaTCPactual[1]+llistaFlangeAct[1])/2,(llistaTCPactual[2]+llistaFlangeAct[2])/2,llistaTCPactual[3],llistaTCPactual[4],llistaTCPactual[5]]
      'Amb IFs pq el thread es un bucle pq te indicat loops forever'
      'Mirem el TCP'
@@ -92,10 +104,10 @@
        'Si la distancia calculada supera el valor r, entrem a la condicio perque estem intentant superar el limit.'
        If distPunts≥r or distPunts≤-r
          surtTcpCilindre≔ True 
-     'Mirem el Flange'
+     'Mirem la part superior de l'eina.'
      If (llistaFlangeAct[2]-centre[2])≤alturaCon and (llistaFlangeAct[2]-centre[2])>0
        rf≔R-(alturaCon-(llistaFlangeAct[2]-centre[2]))-rFlange
-       'Calculem la distancia entre dos punts, el centre i el flange al pla X-Y'
+       'Calculem la distancia entre dos punts, el centre i la part superior de l'eina al pla X-Y'
        distPuntFlange≔sqrt(pow(llistaFlangeAct[0]-centre[0],2)+pow(llistaFlangeAct[1]-centre[1],2))
        'Si la distancia calculada supera el valor rf, entrem a la condicio perque estem intentant superar el limit.'
        If distPuntFlange≥rf or distPuntFlange≤-rf
@@ -122,3 +134,4 @@
        'Si la distancia calculada supera el valor r, entrem a la condicio perque estem intentant superar el limit.'
        If distPuntMig≥rm or distPuntMig≤-rm
          surtMigCilin≔ True 
+     Wait: 0.01
