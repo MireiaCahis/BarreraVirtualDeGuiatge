@@ -10,9 +10,10 @@ Per tal de poder executar aquest codi, és primordial haver-se descarregat prèv
 Tenint aquest pas previ, es pot descarregar el codi en format .urp que pot ser obert a partir del simulador fora de línia del cobot UR3e d’Universal Robots.
 
     1. Descarregar el fitxer .urp del repositori.
-    2. Col·locar el fitxer descarregat dins la carpeta de fitxers del cobot UR3e de la màquina virtual (**Programs UR3**).
-    3. Obrir el programa **URSim UR3**. 
-    4. Obrir el fitxer .urp de la carpeta.
+    2. Descarregar el fitxer .installation del repositori.
+    3. Col·locar els fitxers descarregats dins la carpeta de fitxers del cobot UR3e de la màquina virtual (**Programs UR3**).
+    4. Obrir el programa **URSim UR3**. 
+    5. Obrir el fitxer .urp de la carpeta i tot seguit obrir el fitxer .installation.
 
 En aquest repositori també es pot trobar el codi en format .txt que permet llegir el codi sense la necessitat de ser descarregat i obert amb el simulador fora de línia. 
 
